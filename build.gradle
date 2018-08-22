@@ -27,6 +27,8 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.scala-lang/scala-library
     compile group: 'org.scala-lang', name: 'scala-library', version: scalaSemanticVersion
+    // https://mvnrepository.com/artifact/com.github.jsqlparser/jsqlparser
+    compile group: 'com.github.jsqlparser', name: 'jsqlparser', version: '1.2'
     // https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-costexplorer
     compile group: 'com.amazonaws', name: 'aws-java-sdk-costexplorer', version: awsSdkVersion
     // https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-sts
