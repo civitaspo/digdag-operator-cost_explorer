@@ -5,7 +5,7 @@ import java.util.{Arrays => JArrays, List => JList}
 import io.digdag.client.config.Config
 import io.digdag.spi.{Operator, OperatorContext, OperatorFactory, OperatorProvider, Plugin, TemplateEngine}
 import javax.inject.Inject
-import pro.civitaspo.digdag.plugin.cost_explorer.operator.AbstractCostExplorerOperator
+import pro.civitaspo.digdag.plugin.cost_explorer.operator.{AbstractCostExplorerOperator, CostExplorerGetCostOperator}
 
 object CostExplorerPlugin {
 
@@ -15,7 +15,7 @@ object CostExplorerPlugin {
     @Inject protected var templateEngine: TemplateEngine = null
 
     override def get(): JList[OperatorFactory] = {
-      JArrays.asList()
+      JArrays.asList(operatorFactory("cost_explorer.get_cost", classOf[CostExplorerGetCostOperator]))
     }
 
     private def operatorFactory[T <: AbstractCostExplorerOperator](operatorName: String, klass: Class[T]): OperatorFactory = {
