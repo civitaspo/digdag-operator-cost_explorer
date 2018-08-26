@@ -124,7 +124,7 @@ Specify the filter condition by using the syntax like SQL Where clause. Compared
 - **cost_explorer.last_get_cost.results**: The results by each time period. (array of map)
   - **start_date**: The beginning of the time period. (string)
   - **end_date**: The end of the time period. (string)
-  - **group_keys**: The group keys that are included in this time period. (array of string)
+  - **group_values**: The group values that are included in this time period. (array of string)
   - **amortized_cost**:
     - **amount**: The actual number that represents the metric. (string)
     - **unit**: The unit that the metric is given in. (string)
