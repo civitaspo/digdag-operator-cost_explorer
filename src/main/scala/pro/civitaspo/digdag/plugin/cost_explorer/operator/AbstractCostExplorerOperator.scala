@@ -78,6 +78,10 @@ abstract class AbstractCostExplorerOperator(operatorName: String, context: Opera
       val ec = new EndpointConfiguration(endpoint.get(), r)
       builder.setEndpointConfiguration(ec)
     }
+    else {
+      val ec = new EndpointConfiguration("ce.us-east-1.amazonaws.com", "us-east-1")
+      builder.setEndpointConfiguration(ec)
+    }
 
     builder.build()
   }
