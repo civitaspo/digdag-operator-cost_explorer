@@ -39,7 +39,7 @@ class CostExplorerGetCostOperator (operatorName: String, context: OperatorContex
     sd
   }
   val endDate: String = {
-    val ed = params.get("end_date", classOf[String], startDate)
+    val ed = params.get("end_date", classOf[String], LocalDate.now().toString)
     if (!ed.matches("""\A\d{4}-\d{2}-\d{2}\z""")) throw new ConfigException(s"""[${operatorName}] "end_date" must be `\d{4}-\d{2}-\d{2}`: $ed""")
     ed
   }
