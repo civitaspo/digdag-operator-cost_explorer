@@ -17,7 +17,7 @@ class CostExplorerGetCostOperator (operatorName: String, context: OperatorContex
 
   val filter: Optional[String] = params.getOptional("filter", classOf[String])
   val granularity: Granularity = params.get("granularity", classOf[Granularity], DAILY)
-  val groupBy: Optional[String] = params.getOptional("group_by", classOf[String])
+  val groupBy: Seq[String] = params.getListOrEmpty("group_by", classOf[String]).asScala
   val metrics: Seq[String] = {
     val m = params.getListOrEmpty("metrics", classOf[String]).asScala
     if (!m.forall(_m => Seq("AmortizedCost", "BlendedCost", "UnblendedCost", "UsageQuantity").exists(_.equals(_m)))) {
