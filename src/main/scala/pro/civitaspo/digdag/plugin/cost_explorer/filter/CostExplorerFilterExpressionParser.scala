@@ -129,10 +129,16 @@ class CostExplorerFilterExpressionParser(tagValuesGetter: TagValuesGetter, dimen
   private class CostExplorerFilterExpressionVisitor(ceExpr: costexplorer.model.Expression = new costexplorer.model.Expression)
       extends ExpressionVisitorAdapter {
 
-    private def trimQuates(s: String): String = {
+    private def trimQuotes(s: String): String = {
       s
         .replaceAll("""\A'""", "")
         .replaceAll("""'\z""", "")
+    }
+
+    private def trimBackquotes(s: String): String = {
+      s
+        .replaceAll("""\A`""", "")
+        .replaceAll("""`\z""", "")
     }
 
     override def visit(parenthesis: Parenthesis): Unit = {
@@ -153,12 +159,12 @@ class CostExplorerFilterExpressionParser(tagValuesGetter: TagValuesGetter, dimen
     }
 
     override def visit(expr: EqualsTo): Unit = {
-      val k: String = expr.getLeftExpression.toString
+      val k: String = trimBackquotes(expr.getLeftExpression.toString)
       if (isDimension(k)) {
-        ceExpr.setDimensions(new DimensionValues().withKey(k).withValues(trimQuates(expr.getRightExpression.toString)))
+        ceExpr.setDimensions(new DimensionValues().withKey(k).withValues(trimQuotes(expr.getRightExpression.toString)))
       }
       else {
-        ceExpr.setTags(new TagValues().withKey(k).withValues(trimQuates(expr.getRightExpression.toString)))
+        ceExpr.setTags(new TagValues().withKey(k).withValues(trimQuotes(expr.getRightExpression.toString)))
       }
     }
 
@@ -167,8 +173,8 @@ class CostExplorerFilterExpressionParser(tagValuesGetter: TagValuesGetter, dimen
     }
 
     override def visit(expr: LikeExpression): Unit = {
-      val k: String = expr.getLeftExpression.toString
-      val likeRegex: Regex = LikeRegexConverter.convert(trimQuates(expr.getRightExpression.toString))
+      val k: String = trimBackquotes(expr.getLeftExpression.toString)
+      val likeRegex: Regex = LikeRegexConverter.convert(trimQuotes(expr.getRightExpression.toString))
       if (isDimension(k)) {
         setNotOr(expr.isNot) { newOrCEExpr =>
           val vals: Seq[String] = dimensionValuesGetter.getDimensionValues(k, likeRegex)
@@ -196,24 +202,24 @@ class CostExplorerFilterExpressionParser(tagValuesGetter: TagValuesGetter, dimen
     }
 
     override def visit(expr: NotEqualsTo): Unit = {
-      val k: String = expr.getLeftExpression.toString
+      val k: String = trimBackquotes(expr.getLeftExpression.toString)
       if (isDimension(k)) {
-        ceExpr.setNot(withNewCEExpr { newCEExpr => newCEExpr.setDimensions(new DimensionValues().withKey(k).withValues(trimQuates(expr.getRightExpression.toString)))
+        ceExpr.setNot(withNewCEExpr { newCEExpr => newCEExpr.setDimensions(new DimensionValues().withKey(k).withValues(trimQuotes(expr.getRightExpression.toString)))
         })
       }
       else {
-        ceExpr.setNot(withNewCEExpr { newCEExpr => newCEExpr.setTags(new TagValues().withKey(k).withValues(trimQuates(expr.getRightExpression.toString)))
+        ceExpr.setNot(withNewCEExpr { newCEExpr => newCEExpr.setTags(new TagValues().withKey(k).withValues(trimQuotes(expr.getRightExpression.toString)))
         })
       }
     }
 
     override def visit(expr: InExpression): Unit = {
-      val k: String = expr.getLeftExpression.toString
+      val k: String = trimBackquotes(expr.getLeftExpression.toString)
       if (isDimension(k)) {
         expr.getRightItemsList.accept(new ItemsListVisitorAdapter {
           override def visit(expressionList: ExpressionList): Unit = {
             setNotOr(expr.isNot) { newOrCEExpr =>
-              val dimVals: DimensionValues = new DimensionValues().withKey(k).withValues(expressionList.getExpressions.asScala.map(x => trimQuates(x.toString)): _*)
+              val dimVals: DimensionValues = new DimensionValues().withKey(k).withValues(expressionList.getExpressions.asScala.map(x => trimQuotes(x.toString)): _*)
               newOrCEExpr.setDimensions(dimVals)
             }
           }
@@ -223,7 +229,7 @@ class CostExplorerFilterExpressionParser(tagValuesGetter: TagValuesGetter, dimen
         expr.getRightItemsList.accept(new ItemsListVisitorAdapter {
           override def visit(expressionList: ExpressionList): Unit = {
             setNotOr(expr.isNot) { newOrCEExpr =>
-              val tagVals: TagValues = new TagValues().withKey(k).withValues(expressionList.getExpressions.asScala.map(x => trimQuates(x.toString)): _*)
+              val tagVals: TagValues = new TagValues().withKey(k).withValues(expressionList.getExpressions.asScala.map(x => trimQuotes(x.toString)): _*)
               newOrCEExpr.setTags(tagVals)
             }
           }
@@ -251,7 +257,7 @@ class CostExplorerFilterExpressionParser(tagValuesGetter: TagValuesGetter, dimen
     override def visit(expr: IsNullExpression): Unit = throw new UnsupportedOperationException
     override def visit(expr: MinorThan): Unit = throw new UnsupportedOperationException
     override def visit(expr: MinorThanEquals): Unit = throw new UnsupportedOperationException
-    override def visit(column: Column): Unit = throw new UnsupportedOperationException
+    override def visit(column: Column): Unit = throw new UnsupportedOperationException(column.toString)
     override def visit(subSelect: SubSelect): Unit = throw new UnsupportedOperationException
     override def visit(expr: CaseExpression): Unit = throw new UnsupportedOperationException
     override def visit(expr: WhenClause): Unit = throw new UnsupportedOperationException
