@@ -91,8 +91,8 @@ object LikeRegexConverter {
 
   def convert(s: String): Regex = {
     quoteMeta(s)
-      .replaceAll("(?<!\\\\)_", ".")
-      .replaceAll("(?<!\\\\)%", ".*")
+      .replaceAll("""(?<!\\)_""", ".")
+      .replaceAll("""(?<!\\)%""", ".*")
       .r
   }
 
@@ -129,6 +129,12 @@ class CostExplorerFilterExpressionParser(tagValuesGetter: TagValuesGetter, dimen
   private class CostExplorerFilterExpressionVisitor(ceExpr: costexplorer.model.Expression = new costexplorer.model.Expression)
       extends ExpressionVisitorAdapter {
 
+    private def trimQuates(s: String): String = {
+      s
+        .replaceAll("""\A'""", "")
+        .replaceAll("""'\z""", "")
+    }
+
     override def visit(parenthesis: Parenthesis): Unit = {
       setNotOr(parenthesis.isNot) { newOrCEExpr => parenthesis.getExpression.accept(new CostExplorerFilterExpressionVisitor(ceExpr = newOrCEExpr))
       }
@@ -149,10 +155,10 @@ class CostExplorerFilterExpressionParser(tagValuesGetter: TagValuesGetter, dimen
     override def visit(expr: EqualsTo): Unit = {
       val k: String = expr.getLeftExpression.toString
       if (isDimension(k)) {
-        ceExpr.setDimensions(new DimensionValues().withKey(k).withValues(expr.getRightExpression.toString))
+        ceExpr.setDimensions(new DimensionValues().withKey(k).withValues(trimQuates(expr.getRightExpression.toString)))
       }
       else {
-        ceExpr.setTags(new TagValues().withKey(k).withValues(expr.getRightExpression.toString))
+        ceExpr.setTags(new TagValues().withKey(k).withValues(trimQuates(expr.getRightExpression.toString)))
       }
     }
 
@@ -162,7 +168,7 @@ class CostExplorerFilterExpressionParser(tagValuesGetter: TagValuesGetter, dimen
 
     override def visit(expr: LikeExpression): Unit = {
       val k: String = expr.getLeftExpression.toString
-      val likeRegex: Regex = LikeRegexConverter.convert(expr.getRightExpression.toString)
+      val likeRegex: Regex = LikeRegexConverter.convert(trimQuates(expr.getRightExpression.toString))
       if (isDimension(k)) {
         setNotOr(expr.isNot) { newOrCEExpr =>
           val vals: Seq[String] = dimensionValuesGetter.getDimensionValues(k, likeRegex)
@@ -192,11 +198,11 @@ class CostExplorerFilterExpressionParser(tagValuesGetter: TagValuesGetter, dimen
     override def visit(expr: NotEqualsTo): Unit = {
       val k: String = expr.getLeftExpression.toString
       if (isDimension(k)) {
-        ceExpr.setNot(withNewCEExpr { newCEExpr => newCEExpr.setDimensions(new DimensionValues().withKey(k).withValues(expr.getRightExpression.toString))
+        ceExpr.setNot(withNewCEExpr { newCEExpr => newCEExpr.setDimensions(new DimensionValues().withKey(k).withValues(trimQuates(expr.getRightExpression.toString)))
         })
       }
       else {
-        ceExpr.setNot(withNewCEExpr { newCEExpr => newCEExpr.setTags(new TagValues().withKey(k).withValues(expr.getRightExpression.toString))
+        ceExpr.setNot(withNewCEExpr { newCEExpr => newCEExpr.setTags(new TagValues().withKey(k).withValues(trimQuates(expr.getRightExpression.toString)))
         })
       }
     }
@@ -207,7 +213,7 @@ class CostExplorerFilterExpressionParser(tagValuesGetter: TagValuesGetter, dimen
         expr.getRightItemsList.accept(new ItemsListVisitorAdapter {
           override def visit(expressionList: ExpressionList): Unit = {
             setNotOr(expr.isNot) { newOrCEExpr =>
-              val dimVals: DimensionValues = new DimensionValues().withKey(k).withValues(expressionList.getExpressions.asScala.map(_.toString): _*)
+              val dimVals: DimensionValues = new DimensionValues().withKey(k).withValues(expressionList.getExpressions.asScala.map(x => trimQuates(x.toString)): _*)
               newOrCEExpr.setDimensions(dimVals)
             }
           }
@@ -217,7 +223,7 @@ class CostExplorerFilterExpressionParser(tagValuesGetter: TagValuesGetter, dimen
         expr.getRightItemsList.accept(new ItemsListVisitorAdapter {
           override def visit(expressionList: ExpressionList): Unit = {
             setNotOr(expr.isNot) { newOrCEExpr =>
-              val tagVals: TagValues = new TagValues().withKey(k).withValues(expressionList.getExpressions.asScala.map(_.toString): _*)
+              val tagVals: TagValues = new TagValues().withKey(k).withValues(expressionList.getExpressions.asScala.map(x => trimQuates(x.toString)): _*)
               newOrCEExpr.setTags(tagVals)
             }
           }

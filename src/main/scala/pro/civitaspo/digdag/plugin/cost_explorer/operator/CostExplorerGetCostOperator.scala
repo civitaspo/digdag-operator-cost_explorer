@@ -58,6 +58,7 @@ class CostExplorerGetCostOperator (operatorName: String, context: OperatorContex
 
         val builder = Seq.newBuilder[String]
         val res = withAWSCostExplorer(_.getDimensionValues(req))
+        logger.info(s"[$operatorName] request: $req, response: $res")
         // NOTE: Is there the case that dimVal.getAttributes is required?
         res.getDimensionValues.asScala.map(_.getValue).filter(_.matches(filter.regex)).foreach(builder += _)
         Option(res.getNextPageToken) match {
@@ -80,6 +81,7 @@ class CostExplorerGetCostOperator (operatorName: String, context: OperatorContex
 
         val builder = Seq.newBuilder[String]
         val res = withAWSCostExplorer(_.getTags(req))
+        logger.info(s"[$operatorName] request: $req, response: $res")
         res.getTags.asScala.filter(_.matches(filter.regex)).foreach(builder += _)
         Option(res.getNextPageToken) match {
           case Some(t) => getTagsRecursive(key, filter, Option(t)).foreach(builder += _)
@@ -186,7 +188,11 @@ class CostExplorerGetCostOperator (operatorName: String, context: OperatorContex
       .withTimePeriod(timePeriod)
 
     if (nextPageToken.isDefined) req.setNextPageToken(nextPageToken.get)
-    if (filter.isPresent) req.setFilter(filterParser.parse(filter.get))
+    if (filter.isPresent) {
+      val f = filterParser.parse(filter.get)
+      logger.info(s"[${operatorName}] filter: ${f.toString}")
+      req.setFilter(f)
+    }
     if (groupBy.nonEmpty) {
       val groups = groupBy.map { key =>
         new GroupDefinition()
