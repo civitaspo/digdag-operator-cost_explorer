@@ -112,6 +112,11 @@ Specify the filter condition by using the syntax like SQL Where clause. Compared
 - `(...expressions...)`
 - `NOT (...expressions...)`
 
+##### Quotation Policy
+
+- Columns must be surrounded by back quotes.
+- Operator arguments must be surrounded by single quotes. 
+
 ##### Examples
 
 - ```filter: "enviornment = 'production' and INSTANCE_TYPE in ('p3.16xlarge', 'p2.16xlarge')"```
