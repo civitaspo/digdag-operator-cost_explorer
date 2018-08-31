@@ -1,0 +1,18 @@
+_export:
+  plugin:
+    repositories:
+      - file://${repos}
+      # - https://jitpack.io
+    dependencies:
+      - pro.civitaspo:digdag-operator-cost_explorer:0.0.1
+  cost_explorer:
+    auth_method: profile
+
++step1:
+  cost_explorer.get_cost>:
+  filter: >
+    "INSTANCE_TYPE" like 't2.%' and "REGION" = 'ap-northeast-1'
+
++step2:
+  echo>: ${cost_explorer.last_get_cost}
+

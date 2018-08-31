@@ -1,6 +1,7 @@
 *~
 /.gradle
 /build
+/out/
 .java-version
 .digdag
 
