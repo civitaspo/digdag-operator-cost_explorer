@@ -21,7 +21,8 @@ _export:
 
 +step1:
   cost_explorer.get_cost>:
-  filter: "enviornment = 'production' and INSTANCE_TYPE in ('p3.16xlarge', 'p2.16xlarge')"
+  filter: >
+    "enviornment" = 'production' and "INSTANCE_TYPE" in ('p3.16xlarge', 'p2.16xlarge')
 
 +step2:
   echo>: ${cost_explorer.last_get_cost}
