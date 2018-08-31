@@ -1,9 +1,20 @@
 package pro.civitaspo.digdag.plugin.cost_explorer.operator
 
-import java.util.{Map => JMap}
 import java.time.LocalDate
+import java.util.{Map => JMap}
 
-import com.amazonaws.services.costexplorer.model.{Context, DateInterval, Dimension, GetCostAndUsageRequest, GetDimensionValuesRequest, GetTagsRequest, Granularity, GroupDefinition, GroupDefinitionType, MetricValue, ResultByTime}
+import com.amazonaws.services.costexplorer.model.{
+  Context,
+  DateInterval,
+  Dimension,
+  GetCostAndUsageRequest,
+  GetDimensionValuesRequest,
+  GetTagsRequest,
+  Granularity,
+  GroupDefinition,
+  MetricValue,
+  ResultByTime
+}
 import com.amazonaws.services.costexplorer.model.Granularity.DAILY
 import com.amazonaws.services.costexplorer.model.GroupDefinitionType.{DIMENSION, TAG}
 import com.google.common.base.Optional
